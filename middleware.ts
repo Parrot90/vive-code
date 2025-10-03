@@ -19,21 +19,28 @@ export default auth((req) => {
     const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
     const isAuthRoute = authRoutes.includes(nextUrl.pathname);
 
+    // Allow API auth routes
     if(isapiAuthRoute){
         return null;
     }
 
-    if(isPublicRoute){
-        return null;
-    }
-
+    // If user is on auth route (sign-in page)
     if(isAuthRoute){
+        // If already logged in, redirect to home
         if(isLoggedIn){
             return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
         }
+        // If not logged in, allow access to sign-in page
         return null;
     }
 
+    // If user is not logged in and trying to access protected routes (including home)
+    if(!isLoggedIn && !isPublicRoute){
+        return Response.redirect(new URL("/auth/sign-in", nextUrl));
+    }
+
+    // Allow access to public routes and authenticated users
+    return null;
 });
 
 export const config = {

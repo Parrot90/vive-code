@@ -1,5 +1,4 @@
 import NextAuth from "next-auth"
-import { PrismaAdapter } from "@auth/prisma-adapter"
 
 import authConfig from "./auth.config"
 import { db } from "./lib/db";
@@ -9,6 +8,9 @@ import { getAccountByUserId, getUserById } from "@/features/auth/actions";
 
  
 export const { auth, handlers, signIn, signOut } = NextAuth({
+  pages: {
+    signIn: "/auth/sign-in",
+  },
   callbacks: {
     /**
      * Handle user creation and account linking after a successful sign-in
@@ -30,18 +32,17 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
             image: user.image,
            
             accounts: {
-              // @ts-ignore
               create: {
                 type: account.type,
                 provider: account.provider,
                 providerAccountId: account.providerAccountId,
-                refreshToken: account.refresh_token,
-                accessToken: account.access_token,
-                expiresAt: account.expires_at,
-                tokenType: account.token_type,
+                refresh_token: account.refresh_token,
+                access_token: account.access_token,
+                expires_at: account.expires_at,
+                token_type: account.token_type,
                 scope: account.scope,
-                idToken: account.id_token,
-                sessionState: account.session_state,
+                id_token: account.id_token,
+                session_state: account.session_state as string,
               },
             },
           },
@@ -67,20 +68,28 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
               type: account.type,
               provider: account.provider,
               providerAccountId: account.providerAccountId,
-              refreshToken: account.refresh_token,
-              accessToken: account.access_token,
-              expiresAt: account.expires_at,
-              tokenType: account.token_type,
+              refresh_token: account.refresh_token,
+              access_token: account.access_token,
+              expires_at: account.expires_at,
+              token_type: account.token_type,
               scope: account.scope,
-              idToken: account.id_token,
-              // @ts-ignore
-              sessionState: account.session_state,
+              id_token: account.id_token,
+              session_state: account.session_state as string,
             },
           });
         }
       }
 
       return true;
+    },
+
+    async redirect({ url, baseUrl }) {
+      // Allows relative callback URLs
+      if (url.startsWith("/")) return `${baseUrl}${url}`
+      // Allows callback URLs on the same origin
+      else if (new URL(url).origin === baseUrl) return url
+      // Default redirect to home page after sign in
+      return "http://localhost:3000"
     },
 
     async jwt({ token, user, account }) {
@@ -113,7 +122,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   },
   
   secret: process.env.AUTH_SECRET,
-  adapter: PrismaAdapter(db),
   session: { strategy: "jwt" },
   ...authConfig,
 })

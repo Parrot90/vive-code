@@ -5,7 +5,7 @@
  */
 
 export const publicRoutes: string[] = [
-   
+   // Add any truly public routes here (like landing pages, about, etc.)
 ]
 
 /**
@@ -20,22 +20,22 @@ export const protectedRoutes: string[] = [
 ]
 
 /**
- * An Array of routes that are accessible to the public
- * Routes that start with this (/api/auth) prefix do not require authentication
+ * An Array of routes that are for authentication
+ * These routes are accessible when not logged in
  * @type {string[]}
  */
 
 export const authRoutes: string[] = [
-    "/auth/sign-in",   // Added leading slash
+    "/auth/sign-in",
    
 ]
 
 /**
- * An Array of routes that are accessible to the public
+ * API routes for authentication
  * Routes that start with this (/api/auth) prefix do not require authentication
  * @type {string}
  */
 
 export const apiAuthPrefix: string = "/api/auth"
 
-export const DEFAULT_LOGIN_REDIRECT = "/"; // Changed to redirect to home page after login
+export const DEFAULT_LOGIN_REDIRECT = "/";
